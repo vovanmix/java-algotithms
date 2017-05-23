@@ -1,119 +1,85 @@
 package com.singingcode.algorithms_part1.assignment1;
 
+import edu.princeton.cs.algs4.WeightedQuickUnionUF;
+
 public class Percolation {
-    private int[][][] grid;
+    private final WeightedQuickUnionUF weightedUnion;
+    private final int n;
+    private final int size;
+    private final boolean[] openings;
+    private int openSites = 0;
 
     // create n-by-n grid, with all sites blocked
     public Percolation(int n) {
         if (n <= 0) {
             throw new java.lang.IllegalArgumentException();
         }
-        this.grid = new int[n][n][2];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                this.grid[i][j] = new int[]{-1, -1};
-            }
-        }
+        this.n = n;
+        this.size = (n * n) + 2;
+        weightedUnion = new WeightedQuickUnionUF(size);
+        openings = new boolean[size];
     }
 
-    private void unionNeighbours(int row, int col) {
-        if (row - 1 >= 0) {
-            this.union(row - 1, col, row, col);
-        }
-        if (row + 1 < this.grid.length) {
-            this.union(row + 1, col, row, col);
-        }
-        if (col - 1 >= 0) {
-            this.union(row, col - 1, row, col);
-        }
-        if (col + 1 < this.grid.length) {
-            this.union(row, col + 1, row, col);
-        }
-    }
-
-    private boolean find(int i, int j, int row, int col) {
-        if (!this.isOpen(i + 1, j + 1)
-                || !this.isOpen(row + 1, col + 1)) {
-            return false;
-        }
-        return this.findRoot(i, j) == this.findRoot(row, col);
-    }
-
-    private int[] findRoot(int i, int j) {
-        if (this.grid[i][j][0] == i && this.grid[i][j][1] == j) {
-            return this.grid[i][j];
-        }
-        return this.findRoot(this.grid[i][j][0], this.grid[i][j][1]);
-    }
-
-    private void union(int i, int j, int row, int col) {
-        if (!this.find(i, j, row, col)) {
-            this.grid[i][j][0] = row;
-            this.grid[i][j][1] = col;
-        }
+    private void unionNeighbours(int row, int col, int index) {
+        int above = index - n;
+        int below = index + n;
+        int left = index - 1;
+        int right = index + 1;
+        if (above > 0 && openings[above]) weightedUnion.union(above, index);
+        if (row < n && openings[below]) weightedUnion.union(below, index);
+        if (col > 1 && openings[left]) weightedUnion.union(left, index);
+        if (col < n && openings[right]) weightedUnion.union(right, index);
     }
 
     private void checkBounds(int row, int col) {
-        if (row < 0 || col < 0 || row >= this.grid.length
-                || col >= this.grid.length) {
+        if (row <= 0 || col <= 0 || row > n || col > n) {
             throw new java.lang.IndexOutOfBoundsException();
         }
     }
 
+    private int getIndex(int row, int col) {
+        return (n * (row - 1)) + (col - 1) + 1;
+    }
+
     // open site (row, col) if it is not open already
     public void open(int row, int col) {
-        row--;
-        col--;
         checkBounds(row, col);
-        this.grid[row][col][0] = row;
-        this.grid[row][col][1] = col;
-        this.unionNeighbours(row, col);
+        if(isOpen(row, col)) return;
+        int index = getIndex(row, col);
+        openings[index] = true;
+        openSites++;
+
+        if (row - 1 == 0) weightedUnion.union(0, index);
+        unionNeighbours(row, col, index);
     }
 
     // is site (row, col) open?
     public boolean isOpen(int row, int col) {
-        row--;
-        col--;
         checkBounds(row, col);
-        return this.grid[row][col][0] != -1;
+        int index = getIndex(row, col);
+        return openings[index];
     }
 
     // is site (row, col) full?
     public boolean isFull(int row, int col) {
-        row--;
-        col--;
         checkBounds(row, col);
-        if (!this.isOpen(row + 1, col + 1)) {
-            return false;
-        }
-        for (int j = 0; j < this.grid.length; j++) {
-            if (find(0, j, row, col)) {
-                return true;
-            }
-        }
-        return false;
+        int index = getIndex(row, col);
+        return weightedUnion.connected(0, index);
     }
 
     // number of open sites
     public int numberOfOpenSites() {
-        int cnt = 0;
-        for (int[][] row : this.grid) {
-            for (int[] col : row) {
-                if (col[0] != -1) {
-                    cnt++;
-                }
-            }
-        }
-        return cnt;
+        return openSites;
     }
 
     // does the system percolate?
     public boolean percolates() {
-        for (int j = 0; j < this.grid.length; j++) {
-            if (this.isFull(this.grid.length, j + 1)) {
-                return true;
-            }
+        int startingIndex = n * n - n + 1;
+        for(int i = startingIndex; i <= n * n; i++){
+            if(!openings[i]) continue;
+            if(weightedUnion.connected(0, i)) return true;
         }
+
         return false;
     }
 

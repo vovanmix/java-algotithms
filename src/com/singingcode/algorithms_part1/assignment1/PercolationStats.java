@@ -46,7 +46,7 @@ public class PercolationStats {
     }
 
     public static void main(String[] args) {
-        PercolationStats stats = new PercolationStats(8, 10);
+        PercolationStats stats = new PercolationStats(200, 100);
 //        PercolationStats stats = new PercolationStats(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
         System.out.println("mean =\t" + stats.mean());
         System.out.println("stddev =\t" + stats.stddev());
