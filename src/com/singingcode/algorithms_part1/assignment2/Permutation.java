@@ -5,7 +5,7 @@ import edu.princeton.cs.algs4.StdIn;
 public class Permutation {
     public static void main(String[] args) {
         int count = Integer.parseInt(args[0]);
-        RandomizedQueue<String> rqueue = new RandomizedQueue<String>();
+        RandomizedQueue2<String> rqueue = new RandomizedQueue2<String>();
         while (!StdIn.isEmpty()) {
             rqueue.enqueue(StdIn.readString());
         }

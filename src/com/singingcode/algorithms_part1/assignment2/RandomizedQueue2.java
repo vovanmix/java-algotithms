@@ -7,11 +7,11 @@ import java.util.Iterator;
 
 // Other randomized option - array where random element is swapped with
 // the last element and the last element is returned
-public class RandomizedQueue<Item> implements Iterable<Item> {
-    private Deque<Item> deque = null;
+public class RandomizedQueue2<Item> implements Iterable<Item> {
+    private Deque2<Item> deque = null;
 
-    public RandomizedQueue() {
-        deque = new Deque<Item>();
+    public RandomizedQueue2() {
+        deque = new Deque2<Item>();
     }
 
     public boolean isEmpty() {
@@ -46,7 +46,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     public static void main(String[] args) {
-        RandomizedQueue<Integer> rq = new RandomizedQueue();
+        RandomizedQueue2<Integer> rq = new RandomizedQueue2();
         StdOut.println(rq.isEmpty());
         //rq.dequeue();
         rq.enqueue(1);
@@ -61,9 +61,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         rq.enqueue(9);
         StdOut.println("-----");
         StdOut.println("Sample Element:" + rq.sample());
-        StdOut.println("Dequeue Element:" + rq.dequeue());
-        StdOut.println("Dequeue Element:" + rq.dequeue());
-        StdOut.println("Dequeue Element:" + rq.dequeue());
+        StdOut.println("Deque2ue Element:" + rq.dequeue());
+        StdOut.println("Deque2ue Element:" + rq.dequeue());
+        StdOut.println("Deque2ue Element:" + rq.dequeue());
         StdOut.println("size :" + rq.size());
         for (int i : rq ) {
             StdOut.println(i);

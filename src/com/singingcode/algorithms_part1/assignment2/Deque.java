@@ -2,31 +2,27 @@ package com.singingcode.algorithms_part1.assignment2;
 
 import edu.princeton.cs.algs4.StdOut;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
-//class Node<Item> {
-//    public Node next;
-//    public Node prev;
-//    public Item value;
-//}
-
-// Linked list is an easy solution
 public class Deque<Item> implements Iterable<Item> {
-    private ArrayList<Item> store;
-    private int start;
-    private int end;
 
-    private static final int maxBuffer = 8;
-    private static final int minBuffer = 4;
+    class Node {
+        public Node next;
+        public Node prev;
+        public Item value;
+
+        public Node(Item item) {
+            value = item;
+        }
+    }
+
+    private Node head, tail;
+    private int size;
 
     public Deque() {
-        store = new ArrayList<>();
-        for (int i = 0; i < maxBuffer * 2; i++) {
-            store.add(null);
-        }
-        start = maxBuffer + 1;
-        end = maxBuffer;
+        head = null;
+        tail = null;
+        size = 0;
     }
 
     public boolean isEmpty() {
@@ -34,46 +30,30 @@ public class Deque<Item> implements Iterable<Item> {
     }
 
     public int size() {
-        return end - start + 1;
-    }
-
-    private void adjust() {
-        if (start > minBuffer || start < maxBuffer
-                || store.size() - end > minBuffer || store.size() - end < maxBuffer ) {
-            return;
-        }
-
-        while (start < maxBuffer) {
-            for (int i = store.size() - 1; i > 0; i--) {
-                store.set(i, store.get(i - 1));
-            }
-            store.set(0, null);
-        }
-        while (store.size() - end < maxBuffer) {
-            store.add(null);
-        }
+        return size;
     }
 
     public void addFirst(Item item) {
-        if (item == null) {
-            throw new java.lang.NullPointerException();
+        Node tmp = head;
+        head = new Node(item);
+        head.next = tmp;
+        if (tail == null) {
+            tail = head;
         }
-
-        start--;
-        store.set(start, item);
-
-        adjust();
+        size++;
     }
 
     public void addLast(Item item) {
-        if (item == null) {
-            throw new java.lang.NullPointerException();
+        if (tail == null) {
+            tail = new Node(item);
+            head = tail;
+        } else {
+            Node tmp = tail;
+            tail = new Node(item);
+            tmp.next = tail;
+            tail.prev = tmp;
         }
-
-        end++;
-        store.set(end, item);
-
-        adjust();
+        size++;
     }
 
     public Item removeFirst() {
@@ -81,13 +61,10 @@ public class Deque<Item> implements Iterable<Item> {
             throw new java.util.NoSuchElementException();
         }
 
-        Item item = store.get(start);
-        store.set(start, null);
-        start++;
-
-        adjust();
-
-        return item;
+        Node tmp = head;
+        head = head.next;
+        size--;
+        return tmp.value;
     }
 
     public Item removeLast() {
@@ -95,30 +72,34 @@ public class Deque<Item> implements Iterable<Item> {
             throw new java.util.NoSuchElementException();
         }
 
-        Item item = store.get(end);
-        store.set(end, null);
-        end--;
+        Node tmp = tail;
+        tail = tail.prev;
+        tail.next = null;
 
-        adjust();
-
-        return item;
+        size--;
+        return tmp.value;
     }
 
 
     private class DequeIterator implements Iterator<Item> {
-        private int i;
+        private Node i;
+
         public DequeIterator() {
-            this.i = start;
+            i = head;
         }
+
         public boolean hasNext() {
-            return i < end;
+            return i != tail;
         }
+
         public Item next() {
             if (!hasNext()) {
                 throw new java.util.NoSuchElementException();
             }
-            return store.get(i++);
+            i = i.next;
+            return i.value;
         }
+
         public void remove() {
             throw new java.lang.UnsupportedOperationException();
         }
@@ -147,4 +128,5 @@ public class Deque<Item> implements Iterable<Item> {
             StdOut.println(i);
         }
     }
+
 }
