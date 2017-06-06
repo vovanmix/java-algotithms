@@ -1,5 +1,3 @@
-package com.singingcode.algorithms_part1.assignment2;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 

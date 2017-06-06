@@ -1,12 +1,10 @@
-package com.singingcode.algorithms_part1.assignment2;
-
 import edu.princeton.cs.algs4.StdOut;
 
 import java.util.Iterator;
 
 public class Deque<Item> implements Iterable<Item> {
 
-    class Node {
+    private class Node {
         public Node next;
         public Node prev;
         public Item value;
@@ -37,6 +35,9 @@ public class Deque<Item> implements Iterable<Item> {
         Node tmp = head;
         head = new Node(item);
         head.next = tmp;
+        if (tmp != null) {
+            tmp.prev = head;
+        }
         if (tail == null) {
             tail = head;
         }
@@ -89,15 +90,16 @@ public class Deque<Item> implements Iterable<Item> {
         }
 
         public boolean hasNext() {
-            return i != tail;
+            return i != null;
         }
 
         public Item next() {
             if (!hasNext()) {
                 throw new java.util.NoSuchElementException();
             }
+            Node tmp = i;
             i = i.next;
-            return i.value;
+            return tmp.value;
         }
 
         public void remove() {
@@ -127,6 +129,15 @@ public class Deque<Item> implements Iterable<Item> {
         for (int i : deque) {
             StdOut.println(i);
         }
+
+//        StdOut.println(deque.isEmpty());
+//        deque.addFirst(1);
+//        deque.addFirst(2);
+//        for (int i : deque) {
+//            StdOut.println(i);
+//        }
+//        StdOut.println(deque.removeLast());
+
     }
 
 }
