@@ -3,9 +3,10 @@ package com.singingcode.algorithms_part1.assignment2;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
+// Other randomized option - array where random element is swapped with
+// the last element and the last element is returned
 public class RandomizedQueue<Item> implements Iterable<Item> {
     private Deque<Item> deque = null;
 

@@ -10,6 +10,7 @@ import java.util.Iterator;
 //    public Node prev;
 //    public Item value;
 //}
+
 // Linked list is an easy solution
 public class Deque<Item> implements Iterable<Item> {
     private ArrayList<Item> store;
