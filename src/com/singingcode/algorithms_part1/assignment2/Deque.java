@@ -5,6 +5,11 @@ import edu.princeton.cs.algs4.StdOut;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+//class Node<Item> {
+//    public Node next;
+//    public Node prev;
+//    public Item value;
+//}
 // Linked list is an easy solution
 public class Deque<Item> implements Iterable<Item> {
     private ArrayList<Item> store;
@@ -32,7 +37,8 @@ public class Deque<Item> implements Iterable<Item> {
     }
 
     private void adjust() {
-        if (start > minBuffer || store.size() - end > minBuffer ) {
+        if (start > minBuffer || start < maxBuffer
+                || store.size() - end > minBuffer || store.size() - end < maxBuffer ) {
             return;
         }
 
