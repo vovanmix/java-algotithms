@@ -33,7 +33,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         store.set(end, item);
     }
 
-    public Item dequeue() {
+    private int getRandomIndex() {
         if( isEmpty()) {
             throw new java.util.NoSuchElementException();
         }
@@ -41,6 +41,11 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         if (end > 0) {
             idx = StdRandom.uniform(end);
         }
+        return idx;
+    }
+
+    public Item dequeue() {
+        int idx = getRandomIndex();
         Item tmp = store.get(idx);
         store.set(idx, store.get(end));
         store.set(end, null);
@@ -49,13 +54,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     public Item sample() {
-        if( isEmpty()) {
-            throw new java.util.NoSuchElementException();
-        }
-        int idx = 0;
-        if (end > 0) {
-            idx = StdRandom.uniform(end);
-        }
+        int idx = getRandomIndex();
         return store.get(idx);
     }
 
