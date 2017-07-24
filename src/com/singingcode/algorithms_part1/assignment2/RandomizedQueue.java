@@ -5,13 +5,13 @@ import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
+    private static final int BUFFER = 8;
     private ArrayList<Item> store;
     private int end;
-    private static final int buffer = 8;
 
     public RandomizedQueue() {
         store = new ArrayList<>();
-        for (int i = 0; i < buffer * 2; i++) {
+        for (int i = 0; i < BUFFER * 2; i++) {
             store.add(null);
         }
         end = -1;
@@ -30,11 +30,17 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             throw new java.lang.NullPointerException();
         }
         end++;
+        if (store.size() <= end + 1 ) {
+            int max = store.size() + BUFFER;
+            for (int i = end; i < max ; i++) {
+                store.add(null);
+            }
+        }
         store.set(end, item);
     }
 
     private int getRandomIndex() {
-        if( isEmpty()) {
+        if (isEmpty()) {
             throw new java.util.NoSuchElementException();
         }
         int idx = 0;
@@ -50,6 +56,13 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         store.set(idx, store.get(end));
         store.set(end, null);
         end--;
+
+        if (store.size() >= end + BUFFER * 2 ) {
+            for (int i = 0; i < BUFFER ; i++) {
+                store.remove(store.size() - 1);
+            }
+        }
+
         return tmp;
     }
 
@@ -89,17 +102,38 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     public static void main(String[] args) {
         RandomizedQueue<Integer> rq = new RandomizedQueue<Integer>();
         StdOut.println(rq.isEmpty());
-        //rq.dequeue();
         rq.enqueue(1);
         rq.enqueue(2);
         rq.enqueue(3);
         rq.enqueue(4);
         rq.enqueue(5);
         rq.enqueue(6);
-        StdOut.println("size :" + rq.size());
+        StdOut.println("size (6) :" + rq.size());
         rq.enqueue(7);
         rq.enqueue(8);
         rq.enqueue(9);
+        rq.enqueue(4);
+        rq.enqueue(5);
+        rq.enqueue(6);
+        StdOut.println("size (12) :" + rq.size());
+        rq.enqueue(4);
+        rq.enqueue(5);
+        rq.enqueue(6);
+        StdOut.println("size (15) :" + rq.size());
+        rq.enqueue(4);
+        rq.enqueue(5);
+        rq.enqueue(6);
+
+        rq.dequeue();
+        rq.dequeue();
+        rq.dequeue();
+        rq.dequeue();
+        rq.dequeue();
+        rq.dequeue();
+        rq.dequeue();
+        rq.dequeue();
+
+        StdOut.println("size (10) :" + rq.size());
         StdOut.println("-----");
         StdOut.println("Sample Element:" + rq.sample());
         StdOut.println("Deque2ue Element:" + rq.dequeue());
