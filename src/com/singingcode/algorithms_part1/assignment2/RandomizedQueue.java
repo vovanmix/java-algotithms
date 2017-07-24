@@ -11,6 +11,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     public RandomizedQueue() {
         store = new ArrayList<>();
+        // maybe just add() / remove() without a buffer will be enough
         for (int i = 0; i < BUFFER * 2; i++) {
             store.add(null);
         }
