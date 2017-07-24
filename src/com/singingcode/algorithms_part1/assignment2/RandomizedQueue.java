@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import edu.princeton.cs.algs4.StdOut;
@@ -6,15 +6,11 @@ import edu.princeton.cs.algs4.StdRandom;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
     private static final int BUFFER = 8;
-    private ArrayList<Item> store;
+    private Item[] store;
     private int end;
 
     public RandomizedQueue() {
-        store = new ArrayList<>();
-        // maybe just add() / remove() without a buffer will be enough
-        for (int i = 0; i < BUFFER * 2; i++) {
-            store.add(null);
-        }
+        store = (Item[]) new Object[BUFFER * 2];
         end = -1;
     }
 
@@ -31,13 +27,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             throw new java.lang.NullPointerException();
         }
         end++;
-        if (store.size() <= end + 1 ) {
-            int max = store.size() + BUFFER;
-            for (int i = end; i < max ; i++) {
-                store.add(null);
-            }
+        if (store.length <= end + 1) {
+            store = Arrays.copyOf(store, store.length + BUFFER);
         }
-        store.set(end, item);
+        store[end] = item;
     }
 
     private int getRandomIndex() {
@@ -53,15 +46,13 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     public Item dequeue() {
         int idx = getRandomIndex();
-        Item tmp = store.get(idx);
-        store.set(idx, store.get(end));
-        store.set(end, null);
+        Item tmp = store[idx];
+        store[idx] = store[end];
+        store[end] = null;
         end--;
 
-        if (store.size() >= end + BUFFER * 2 ) {
-            for (int i = 0; i < BUFFER ; i++) {
-                store.remove(store.size() - 1);
-            }
+        if (store.length >= end + BUFFER * 2) {
+            store = Arrays.copyOf(store, end + BUFFER);
         }
 
         return tmp;
@@ -69,7 +60,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     public Item sample() {
         int idx = getRandomIndex();
-        return store.get(idx);
+        return store[idx];
     }
 
 
@@ -88,7 +79,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             if (!hasNext()) {
                 throw new java.util.NoSuchElementException();
             }
-            return store.get(i++);
+            return store[i++];
         }
 
         public void remove() {
