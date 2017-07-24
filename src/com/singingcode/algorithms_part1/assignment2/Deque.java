@@ -3,6 +3,8 @@ import edu.princeton.cs.algs4.StdOut;
 import java.util.Iterator;
 
 public class Deque<Item> implements Iterable<Item> {
+    private Node head, tail;
+    private int size;
 
     private class Node {
         Node next;
@@ -13,9 +15,6 @@ public class Deque<Item> implements Iterable<Item> {
             value = item;
         }
     }
-
-    private Node head, tail;
-    private int size;
 
     public Deque() {
         head = null;
