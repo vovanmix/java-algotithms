@@ -1,17 +1,19 @@
 package com.singingcode.algorithms_part1.assignment3collinear;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-public class BruteCollinearPoints {
+public class FastCollinearPoints {
     private static final double EPSILON = 0.0000000001;
     private final Point[] points;
 
-    public BruteCollinearPoints(Point[] points) {
+    // finds all line segments containing 4 or more points
+    // FastCollinearPoints should work properly even if the input has 5 or more
+    // collinear points.
+    public FastCollinearPoints(Point[] points) {
         if (points == null) {
             throw new java.lang.IllegalArgumentException();
         }
@@ -27,29 +29,38 @@ public class BruteCollinearPoints {
         }
 
         this.points = points.clone();
+
     }
 
+    // the number of line segments
     public int numberOfSegments() {
         return segments().length;
     }
 
+    // the line segments
     public LineSegment[] segments() {
+        Arrays.sort(points);
         ArrayList<LineSegment> segments = new ArrayList<>();
-        for (int i = 0; i < points.length; i++) {
-            for (int j = i + 1; j < points.length; j++) {
-                double slope1 = points[i].slopeTo(points[j]);
-                for (int k = j + 1; k < points.length; k++) {
-                    double slope2 = points[j].slopeTo(points[k]);
-                    if (Math.abs(slope1 - slope2) >= EPSILON) continue;
+        for (Point point : points) {
+            Point[] sortedPoints = points.clone();
+            Arrays.sort(sortedPoints, point.slopeOrder());
 
-                    for (int m = k + 1; m < points.length; m++) {
-                        double slope3 = points[k].slopeTo(points[m]);
-                        if (Math.abs(slope2 - slope3) >= EPSILON) continue;
+            double lastSlope = -1;
+            int start = -1;
+            int end = -1;
+            for (int j = 0; j < sortedPoints.length; j++) {
+                double currentSlope = sortedPoints[j].slopeTo(point);
+                if (Math.abs(currentSlope - lastSlope) < EPSILON) end = j;
 
-                        Point[] tuple = new Point[] {points[i], points[j], points[k], points[m]};
-                        Arrays.sort(tuple);
-                        segments.add(new LineSegment(tuple[0], tuple[3]));
+                if (Math.abs(currentSlope - lastSlope) >= EPSILON || j == sortedPoints.length - 1) {
+                    /* critical - if starting point of this segment is smaller than point,
+                       then this line segment is already in the collection */
+                    if (end - start + 1 >= 3 && sortedPoints[start].compareTo(point) > 0) {
+                        segments.add(new LineSegment(point, sortedPoints[end]));
+                        break;
                     }
+                    start = j;
+                    lastSlope = currentSlope;
                 }
             }
         }
@@ -78,7 +89,7 @@ public class BruteCollinearPoints {
         StdDraw.show();
 
         // print and draw the line segments
-        BruteCollinearPoints collinear = new BruteCollinearPoints(points);
+        FastCollinearPoints collinear = new FastCollinearPoints(points);
         for (LineSegment segment : collinear.segments()) {
             StdOut.println(segment);
             segment.draw();

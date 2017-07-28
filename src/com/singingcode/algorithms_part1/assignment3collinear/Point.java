@@ -7,7 +7,6 @@ public class Point implements Comparable<Point> {
 
     private final int x;     // x-coordinate of this point
     private final int y;     // y-coordinate of this point
-    private Comparator<Point> slopeOrder;
 
     /**
      * Initializes a new point.
@@ -63,7 +62,7 @@ public class Point implements Comparable<Point> {
             return +0.0;
         }
 
-        return (that.y - this.y) / (that.x - this.x);
+        return (double) (that.y - this.y) / (double) (that.x - this.x);
     }
 
     /**
@@ -99,7 +98,7 @@ public class Point implements Comparable<Point> {
      */
     public Comparator<Point> slopeOrder() {
         /* YOUR CODE HERE */
-        return slopeOrder;
+        return new SlopeOrder();
     }
 
     private class SlopeOrder implements Comparator<Point> {
