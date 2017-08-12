@@ -6,6 +6,7 @@ import edu.princeton.cs.algs4.StdDraw;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Stack;
 
 public class KdTree {
@@ -17,9 +18,9 @@ public class KdTree {
         private Node lb;        // the left/bottom subtree
         private Node rt;        // the right/top subtree
 
-        public Node(Point2D p) { //, RectHV rect) {
+        public Node(Point2D p, RectHV rect) {
             this.p = p;
-//            this.rect = rect;
+            this.rect = rect;
         }
     }
 
@@ -44,41 +45,57 @@ public class KdTree {
         return cnt;
     }
 
+    // add the point p to the set (if it is not already in the set)
     public void insert(Point2D p) {
-        if (p == null) { throw new java.lang.IllegalArgumentException(); }
-        root = insert(root, p, false);
+        if (root == null) {
+            root = new Node(p, new RectHV(0f, 0f, 1f, 1f));
+            return;
+        }
+        insert(root, p, 0);
     }
 
-    /**
-     * odd - y
-     * even - x
-     */
-    private Node insert(Node n, Point2D p, boolean even) {
-        if (n == null) {
-//            if (parent == null) {
-//                RectHV rect = new RectHV(0, 0, 1, 1);
-//            } else if (even) {
-//                RectHV rect = new RectHV();
-//            } else {
-//                RectHV rect = new RectHV();
-//            }
-            return new Node(p); //, rect);
-        }
+    private void insert(Node node, Point2D p, int depth) {
+        if (node == null)
+            return;
 
-        if (isLeftBottom(n.p, p, even)) {
-//            if (n.lb == null) {
-//                n.lb = ...
-//            } else {
-                n.lb = insert(n.lb, p, !even);
-//            }
+        if (node.p.equals(p))
+            return;
+
+        boolean xCoordinate = depth % 2 == 0;
+        if (xCoordinate) {
+            if (p.x() < node.p.x()) {
+                if (node.lb == null) {
+                    node.lb = new Node(p, new RectHV(node.rect.xmin(),
+                            node.rect.ymin(), node.p.x(), node.rect.ymax()));
+                } else {
+                    insert(node.lb, p, depth + 1);
+                }
+            } else {
+                if (node.rt == null) {
+                    node.rt = new Node(p, new RectHV(node.p.x(),
+                            node.rect.ymin(), node.rect.xmax(),
+                            node.rect.ymax()));
+                } else {
+                    insert(node.rt, p, depth + 1);
+                }
+            }
         } else {
-//            if (n.rt == null) {
-//                n.rt = ...
-//            } else {
-                n.rt = insert(n.rt, p, !even);
-//            }
+            if (p.y() < node.p.y()) {
+                if (node.lb == null) {
+                    node.lb = new Node(p, new RectHV(node.rect.xmin(),
+                            node.rect.ymin(), node.rect.xmax(), node.p.y()));
+                } else {
+                    insert(node.lb, p, depth + 1);
+                }
+            } else {
+                if (node.rt == null) {
+                    node.rt = new Node(p, new RectHV(node.rect.xmin(),
+                            node.p.y(), node.rect.xmax(), node.rect.ymax()));
+                } else {
+                    insert(node.rt, p, depth + 1);
+                }
+            }
         }
-        return n;
     }
 
     public boolean contains(Point2D p) {
@@ -106,11 +123,30 @@ public class KdTree {
     }
 
     public void draw() {
+        draw(root, 0);
+    }
+
+    private void draw(Node node, int depth) {
+        if (node == null)
+            return;
+
+        StdDraw.setPenRadius(.01);
         StdDraw.setPenColor(StdDraw.BLACK);
-        StdDraw.setPenRadius(0.01);
-//        use StdDraw.setPenColor(StdDraw.RED) or StdDraw.setPenColor(StdDraw.BLUE) and StdDraw.setPenRadius() before drawing the splitting lines.
-        // TODO: draw a line too
-        iterator().forEachRemaining(n -> n.p.draw());
+        node.p.draw();
+        StdDraw.setPenRadius();
+        if (depth % 2 == 0) {
+            StdDraw.setPenColor(StdDraw.RED);
+            StdDraw.line(node.p.x(), node.rect.ymin(), node.p.x(),
+                    node.rect.ymax());
+            draw(node.lb, depth + 1);
+            draw(node.rt, depth + 1);
+        } else {
+            StdDraw.setPenColor(StdDraw.BLUE);
+            StdDraw.line(node.rect.xmin(), node.p.y(), node.rect.xmax(),
+                    node.p.y());
+            draw(node.lb, depth + 1);
+            draw(node.rt, depth + 1);
+        }
     }
 
     private Iterator<Node> iterator() {
@@ -143,15 +179,67 @@ public class KdTree {
     }
 
     public Iterable<Point2D> range(RectHV rect) {
-        if (rect == null) { throw new java.lang.IllegalArgumentException(); }
-
-        return new ArrayList<Point2D>();
+        List<Point2D> list = new ArrayList<Point2D>();
+        range(rect, root, list);
+        return list;
     }
 
-    public Point2D nearest(Point2D p) {
-        if (p == null) { throw new java.lang.IllegalArgumentException(); }
+    private void range(RectHV rect, Node node, List<Point2D> list) {
+        if (node == null)
+            return;
 
-        return p;
+        if (rect.contains(node.p))
+            list.add(node.p);
+
+        if (rect.intersects(node.rect)) {
+            range(rect, node.lb, list);
+            range(rect, node.rt, list);
+        }
+    }
+
+    private Point2D nearest = null;
+    private double distanceToNearest = Double.POSITIVE_INFINITY;
+
+    public Point2D nearest(Point2D p) {
+        if (p == null)
+            return null;
+        nearest = root.p;
+        distanceToNearest = root.p.distanceSquaredTo(p);
+        nearest(p, root, 0);
+        return nearest;
+    }
+
+    private void nearest(Point2D p, Node node, int depth) {
+        if (node == null)
+            return;
+
+        // if the closest point discovered so far is closer than the distance
+        // between the query point and the rectangle corresponding to a node,
+        // there is no need to explore that node (or its subtrees).
+        if (node.rect.distanceSquaredTo(p) < distanceToNearest) {
+            double distance = node.p.distanceSquaredTo(p);
+            if (distance < distanceToNearest) {
+                nearest = node.p;
+                distanceToNearest = distance;
+            }
+
+            // The effectiveness of the pruning rule depends on quickly finding
+            // a nearby point. To do this, organize your recursive method so
+            // that when there are two possible subtrees to go down, you always
+            // choose the subtree that is on the same side of the splitting line
+            // as the query point as the first subtree to explore the closest
+            // point found while exploring the first subtree may enable pruning
+            // of the second subtree.
+            boolean xCoordinate = depth % 2 == 0;
+            if ((xCoordinate && p.x() < node.p.x())
+                    || (!xCoordinate && p.y() < node.p.y())) {
+                nearest(p, node.lb, depth + 1);
+                nearest(p, node.rt, depth + 1);
+            } else {
+                nearest(p, node.rt, depth + 1);
+                nearest(p, node.lb, depth + 1);
+            }
+        }
     }
 
     // unit testing of the methods (optional)
@@ -173,17 +261,17 @@ public class KdTree {
         pointsInRect.forEach(i -> System.out.println(i.x()));
         pointsInRect.forEach(i -> System.out.println(i.y()));
 
-//        Point2D p;
-//        Iterator<Point2D> iterator = pointsInRect.iterator();
-//        p = iterator.next();
-//        assert (p.x() == 0.1): p.x();
-//        assert (p.y() == 0.2): p.y();
-//        p = iterator.next();
-//        assert (p.x() == 0.2): p.x();
-//        assert (p.y() == 0.4): p.y();
-//        p = iterator.next();
-//        assert (p.x() == 0.2);
-//        assert (p.y() == 0.5);
+        Point2D p;
+        Iterator<Point2D> iterator = pointsInRect.iterator();
+        p = iterator.next();
+        assert (p.x() == 0.1): p.x();
+        assert (p.y() == 0.2): p.y();
+        p = iterator.next();
+        assert (p.x() == 0.2): p.x();
+        assert (p.y() == 0.4): p.y();
+        p = iterator.next();
+        assert (p.x() == 0.2);
+        assert (p.y() == 0.5);
 
         set.draw();
 
