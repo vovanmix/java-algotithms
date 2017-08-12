@@ -4,6 +4,7 @@ import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.StdDraw;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Stack;
 
@@ -16,9 +17,9 @@ public class KdTree {
         private Node lb;        // the left/bottom subtree
         private Node rt;        // the right/top subtree
 
-        public Node(Point2D p, RectHV rect) {
+        public Node(Point2D p) { //, RectHV rect) {
             this.p = p;
-            this.rect = rect;
+//            this.rect = rect;
         }
     }
 
@@ -53,7 +54,7 @@ public class KdTree {
      * even - x
      */
     private Node insert(Node n, Point2D p, boolean even) {
-//        if (n == null) {
+        if (n == null) {
 //            if (parent == null) {
 //                RectHV rect = new RectHV(0, 0, 1, 1);
 //            } else if (even) {
@@ -61,21 +62,21 @@ public class KdTree {
 //            } else {
 //                RectHV rect = new RectHV();
 //            }
-//            return new Node(p, rect);
-//        }
+            return new Node(p); //, rect);
+        }
 
         if (isLeftBottom(n.p, p, even)) {
-            if (n.lb == null) {
-                n.lb = ...
-            } else {
+//            if (n.lb == null) {
+//                n.lb = ...
+//            } else {
                 n.lb = insert(n.lb, p, !even);
-            }
+//            }
         } else {
-            if (n.rt == null) {
-                n.rt = ...
-            } else {
+//            if (n.rt == null) {
+//                n.rt = ...
+//            } else {
                 n.rt = insert(n.rt, p, !even);
-            }
+//            }
         }
         return n;
     }
@@ -144,11 +145,13 @@ public class KdTree {
     public Iterable<Point2D> range(RectHV rect) {
         if (rect == null) { throw new java.lang.IllegalArgumentException(); }
 
+        return new ArrayList<Point2D>();
     }
 
     public Point2D nearest(Point2D p) {
         if (p == null) { throw new java.lang.IllegalArgumentException(); }
 
+        return p;
     }
 
     // unit testing of the methods (optional)
@@ -170,17 +173,17 @@ public class KdTree {
         pointsInRect.forEach(i -> System.out.println(i.x()));
         pointsInRect.forEach(i -> System.out.println(i.y()));
 
-        Point2D p;
-        Iterator<Point2D> iterator = pointsInRect.iterator();
-        p = iterator.next();
-        assert (p.x() == 0.1): p.x();
-        assert (p.y() == 0.2): p.y();
-        p = iterator.next();
-        assert (p.x() == 0.2): p.x();
-        assert (p.y() == 0.4): p.y();
-        p = iterator.next();
-        assert (p.x() == 0.2);
-        assert (p.y() == 0.5);
+//        Point2D p;
+//        Iterator<Point2D> iterator = pointsInRect.iterator();
+//        p = iterator.next();
+//        assert (p.x() == 0.1): p.x();
+//        assert (p.y() == 0.2): p.y();
+//        p = iterator.next();
+//        assert (p.x() == 0.2): p.x();
+//        assert (p.y() == 0.4): p.y();
+//        p = iterator.next();
+//        assert (p.x() == 0.2);
+//        assert (p.y() == 0.5);
 
         set.draw();
 
