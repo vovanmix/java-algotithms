@@ -2,6 +2,7 @@ package com.singingcode.algorithms_part1.assignment5_kd_trees;
 
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.StdDraw;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -39,6 +40,8 @@ public class PointSET {
 
     // draw all points to standard draw
     public void draw() {
+        StdDraw.setPenColor(StdDraw.BLACK);
+        StdDraw.setPenRadius(0.01);
         for (Point2D p : tree) {
             p.draw();
         }
@@ -106,6 +109,8 @@ public class PointSET {
         p = iterator.next();
         assert (p.x() == 0.2);
         assert (p.y() == 0.5);
+
+        set.draw();
 
         System.out.println("done");
     }
